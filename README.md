@@ -157,8 +157,6 @@ pháp luật.
 
 ## Nhóm nghiên cứu
 
-**Giảng viên hướng dẫn:** ThS. Dương Trọng Khang
-
 | Thành viên | MSSV | Vai trò |
 |---|---|---|
 | Lê Thanh Hải | 23150113 | Trưởng nhóm — kiến trúc hệ thống, triển khai hạ tầng, SOC |

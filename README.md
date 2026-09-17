@@ -61,7 +61,7 @@ REST API, biến hệ thống từ tấm khiên tĩnh thành một thực thể 
 
 Toàn bộ chạy trên VMware để cô lập và kiểm soát biến số thực nghiệm.
 
-![Mô hình thực nghiệm](docs/images/hinh-3-01.png)
+![Mô hình thực nghiệm](docs/images//NginxModel.png)
 
 ---
 

@@ -6,9 +6,6 @@ Repo này chứa toàn bộ cấu hình, hướng dẫn triển khai và kịch 
 hình phòng thủ chiều sâu (*Defense in Depth*) bốn tầng, xây dựng quanh NGINX Reverse
 Proxy và khép kín bằng chu trình phản ứng tự động Splunk SIEM/SOAR.
 
-Mục tiêu thực tiễn: dựng được một **SOC thu nhỏ** hoàn toàn bằng phần mềm mã nguồn mở,
-thay thế các dịch vụ Cloud WAF trả phí cho doanh nghiệp vừa và nhỏ.
-
 ---
 
 ## Kiến trúc

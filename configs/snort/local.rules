@@ -1,0 +1,38 @@
+# Luật Snort cục bộ cho pfSense
+# Đặt tại: /usr/local/etc/snort/snort_<id>/rules/local.rules
+#
+# SID từ 1000000 trở lên được dành riêng cho luật tự viết; dùng SID thấp hơn
+# sẽ xung đột với các bộ luật chính thức khi cập nhật.
+#
+# Lưu ý: file gốc dùng dấu nháy kép Unicode (" ") ở một số luật, khiến Snort
+# báo lỗi parse. Bản dưới đây đã chuẩn hoá về dấu nháy ASCII.
+
+# --- Trinh sát / quét mạng ---
+alert icmp any any -> $HOME_NET any (msg:"ICMP test detected"; gid:1; sid:10000001; rev:1; classtype:icmp-event;)
+
+alert icmp any any -> $HOME_NET any (msg:"Possible Nmap ping sweep"; gid:1; sid:10000002; rev:1; dsize:0; classtype:attempted-recon;)
+
+alert tcp any any -> $HOME_NET any (msg:"TCP Port Scanning"; gid:1; sid:10000003; rev:1; detection_filter:track by_src, count 30, seconds 60; classtype:attempted-recon;)
+
+alert tcp any any -> $HOME_NET any (msg:"Nmap XMAS Tree Scan"; gid:1; sid:10000005; rev:1; flags:FPU; classtype:attempted-recon;)
+
+# --- Từ chối dịch vụ ---
+# 70 gói SYN tới cùng một đích trong 10 giây. Ngưỡng này phù hợp với môi
+# trường lab; mạng production cần nâng lên đáng kể để tránh báo động giả.
+alert tcp any any -> $HOME_NET 80 (msg:"Possible TCP SYN Flood"; gid:1; sid:10000009; rev:1; flags:S; flow:stateless; threshold:type both, track by_dst, count 70, seconds 10; classtype:attempted-dos;)
+
+alert icmp any any -> $HOME_NET any (msg:"Possible Ping of Death"; gid:1; sid:10000013; rev:1; dsize:>1510; classtype:attempted-dos;)
+
+# --- Dò mật khẩu ---
+alert tcp $EXTERNAL_NET any -> $HOME_NET 22 (msg:"SSH BRUTE FORCE login attempt"; gid:1; sid:10000011; rev:1; flow:to_server,established; content:"SSH-"; depth:4; detection_filter:track by_src, count 5, seconds 60; metadata:service ssh; classtype:attempted-admin;)
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET 22 (msg:"Incoming SSH Connection"; gid:1; sid:10000012; rev:1; classtype:misc-activity;)
+
+alert tcp any any -> $HOME_NET 21 (msg:"Incoming FTP connection"; gid:1; sid:10000010; rev:1; flags:S; classtype:misc-activity;)
+
+# --- Kênh C2 ---
+# Nhận diện Meterpreter reverse_http qua đặc trưng độ dài URI và mẫu đường dẫn.
+# Nguồn: blog.didierstevens.com/2015/05/11/detecting-network-traffic-from-metasploits-meterpreter-reverse-http-module/
+alert tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:"Metasploit Meterpreter - outbound"; gid:1; sid:10000007; rev:1; flow:to_server,established; content:"RECV"; http_client_body; depth:4; fast_pattern; isdataat:!0,relative; urilen:23<>24,norm; content:"POST"; pcre:"/^\/[a-z0-9]{4,5}_[a-z0-9]{16}\/$/Ui"; classtype:trojan-activity;)
+
+alert tcp any any -> $HOME_NET $HTTP_PORTS (msg:"Metasploit Meterpreter - inbound"; gid:1; sid:10000008; rev:1; flow:to_server,established; content:"RECV"; http_client_body; depth:4; fast_pattern; isdataat:!0,relative; urilen:23<>24,norm; content:"POST"; pcre:"/^\/[a-z0-9]{4,5}_[a-z0-9]{16}\/$/Ui"; classtype:trojan-activity;)

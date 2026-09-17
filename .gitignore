@@ -1,0 +1,46 @@
+# Chứng chỉ và khóa — tuyệt đối không commit
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+ssl/
+
+# Bí mật và thông tin xác thực
+*secret*
+*password*
+*.token
+.env
+
+# Nhật ký thực tế (chứa IP, dữ liệu nhạy cảm từ lab)
+*.log
+logs/
+modsec_audit.log
+
+# Bản build ModSecurity / NGINX từ source
+*.o
+*.so
+nginx-*.tar.gz
+ModSecurity/
+ModSecurity-nginx/
+coreruleset/
+
+# Gói cài đặt
+*.deb
+*.rpm
+*.pkg
+*.tgz
+*.zip
+*.rar
+
+# Hệ điều hành / trình soạn thảo
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# File tạm từ Office
+~$*.docx
+.~lock.*

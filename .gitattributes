@@ -1,0 +1,5 @@
+# Chuẩn hóa line ending: các file cấu hình Linux và script shell luôn dùng LF
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary

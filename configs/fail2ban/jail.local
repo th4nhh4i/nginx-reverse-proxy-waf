@@ -1,0 +1,72 @@
+# /etc/fail2ban/jail.local
+#
+# Không sửa jail.conf — nó bị ghi đè mỗi lần nâng cấp gói.
+# jail.local luôn được đọc sau và ghi đè jail.conf.
+
+[DEFAULT]
+# Không tự chặn chính mình và máy Splunk
+ignoreip = 127.0.0.1/8 ::1 192.168.121.160
+
+bantime  = 7200
+findtime = 600
+maxretry = 5
+
+# nftables là mặc định trên Ubuntu 22.04; dùng iptables-multiport
+# nếu hệ thống của bạn còn chạy iptables legacy.
+banaction = nftables-multiport
+
+backend = auto
+
+
+# --- Quét lỗ hổng: IP liên tục dò các đường dẫn không tồn tại ---
+[nginx-404]
+enabled  = true
+port     = http,https
+filter   = nginx-404
+logpath  = /var/log/nginx/access.log
+maxretry = 10
+findtime = 600
+bantime  = 7200
+
+
+# --- IP liên tục bị ModSecurity chặn (403) ---
+# Ngưỡng thấp hơn 404 vì một 403 từ WAF đã là hành vi tấn công rõ ràng,
+# không phải người dùng gõ nhầm URL.
+[nginx-modsec]
+enabled  = true
+port     = http,https
+filter   = nginx-modsec
+logpath  = /var/log/nginx/error.log
+maxretry = 3
+findtime = 300
+bantime  = 86400
+
+
+# --- IP chạm trần rate limit (429) — dấu hiệu HTTP Flood ---
+[nginx-limit-req]
+enabled  = true
+port     = http,https
+filter   = nginx-limit-req
+logpath  = /var/log/nginx/error.log
+maxretry = 10
+findtime = 60
+bantime  = 3600
+
+
+# --- Dò mật khẩu qua HTTP Basic Auth ---
+[nginx-http-auth]
+enabled  = true
+port     = http,https
+filter   = nginx-http-auth
+logpath  = /var/log/nginx/error.log
+maxretry = 5
+
+
+# --- Bảo vệ chính kênh SSH mà Splunk SOAR dùng để điều khiển ---
+[sshd]
+enabled  = true
+port     = ssh
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 3
+bantime  = 86400
